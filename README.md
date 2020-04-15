@@ -1,13 +1,22 @@
 # chinese ASR recognition
 
+
 reference :
 https://github.com/rolczynski/Automatic-Speech-Recognition
+
 https://github.com/audier/DeepSpeechRecognition
+
+
+baidu deepspeech2:
+
 https://github.com/mozilla/DeepSpeech
+
+https://github.com/tensorflow/models/blob/master/research/deep_speech/deep_speech.py
 
 ## 1. Introduction
 
 ## 2. acoustics model
+deepspeech_new.py :baidu deepspeech2 model
 
 ctc loss based model
 

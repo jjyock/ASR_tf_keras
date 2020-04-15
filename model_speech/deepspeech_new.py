@@ -1,7 +1,7 @@
+# this model is baidu deepspeech2 ASR model
+
 import keras
-from keras.layers import Input, BatchNormalization, LSTM
-from keras.layers import Reshape, Dense, Lambda, Dropout
-from keras.layers.recurrent import GRU
+from keras.layers import Reshape, Lambda, Dropout
 from keras.layers.merge import add, concatenate
 from keras.optimizers import Adam, SGD, Adadelta
 from keras import backend as K
@@ -10,14 +10,16 @@ from keras.utils import multi_gpu_model
 import tensorflow as tf
 
 from keras.layers import normalization, Conv1D,Conv2D
-from keras.layers import (Convolution1D, Dense, LSTM, Bidirectional,
+from keras.layers import (Dense, LSTM, Bidirectional,
                           Input, GRU, TimeDistributed)
+
+
 _CONV_FILTERS = 32
 def am_hparams():
     params = tf.contrib.training.HParams(
         # vocab
         vocab_size = 50,
-        lr = 0.0008,
+        lr = 0.01,
         gpu_nums = 1,
         is_training = True)
     return params
@@ -39,7 +41,7 @@ class Am():
 
     def _model_init(self):
         #nodes=1000
-        gru_hidden=1000
+        gru_hidden=400
         initialization = 'glorot_uniform'
         self.inputs = Input(name='the_inputs', shape=(None, 200, 1))
         #acoustic_input = Reshape((-1, 200))(self.inputs)
@@ -53,7 +55,7 @@ class Am():
         feat_size = conv_2_bn.get_shape().as_list()[2]
         outputs = Reshape([-1, feat_size * _CONV_FILTERS])(conv_2_bn)
 
-        for r in range(3):
+        for r in range(1):
             # output = GRU(nodes, activation='relu',
             #              name='rnn_{}'.format(r + 1), init=initialization,
             #              return_sequences=True)(output)
@@ -87,22 +89,12 @@ class Am():
 
 
 
-# ============================模型组件=================================
-def bi_gru(units, x):
-    #x = Dropout(0.2)(x)
-    y1 = GRU(units, return_sequences=True,
-        kernel_initializer='he_normal')(x)
-    y2 = GRU(units, return_sequences=True, go_backwards=True,
-        kernel_initializer='he_normal')(x)
-    y = add([y1, y2])
-    return y
 
-
-def dense(units, x, activation="relu"):
-    #x = Dropout(0.2)(x)
-    y = Dense(units, activation=activation, use_bias=True,
-        kernel_initializer='he_normal')(x)
-    return y
+# def dense(units, x, activation="relu"):
+#     #x = Dropout(0.2)(x)
+#     y = Dense(units, activation=activation, use_bias=True,
+#         kernel_initializer='he_normal')(x)
+#     return y
 
 def ctc_lambda(args):
     labels, y_pred, input_length, label_length = args

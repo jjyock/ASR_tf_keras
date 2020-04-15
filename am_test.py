@@ -10,7 +10,7 @@ import joblib
 
 # 0.准备解码所需字典，参数需和训练一致，也可以将字典保存到本地，直接进行读取
 from utils import get_data, data_hparams
-from am_train import thchs30,aishell,prime,stcmd
+from am_train import thchs30,aishell,prime,stcmd,model_save_path
 data_args = data_hparams()
 
 data_args.thchs30 = thchs30
@@ -22,7 +22,7 @@ data_args.data_length = None
 
 
 # 1.声学模型-----------------------------------
-from model_speech.cnn_ctc import Am, am_hparams
+from model_speech.deepspeech_new import Am, am_hparams
 
 am_vocab = joblib.load(os.path.join(os.path.join(PROJECT_PATH,'dict'),'am_vocab_1.joblib'))
 pny_vocab = joblib.load(os.path.join(os.path.join(PROJECT_PATH,'dict'),'pny_vocab_1.joblib'))
@@ -32,7 +32,7 @@ am_args = am_hparams()
 am_args.vocab_size = len(am_vocab)
 am = Am(am_args)
 print('loading acoustic model...')
-am.ctc_model.load_weights('logs_am/model.h5')
+am.ctc_model.load_weights(model_save_path)
 
 data_args.data_type = 'test'
 data_args.shuffle = False

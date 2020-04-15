@@ -9,14 +9,14 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 # dataset to use
 thchs30 = True
 stcmd = True
-prime = False
-aishell = False
+prime = True
+aishell = True
 batch_size = 10
 data_length = None
 is_shuffle = True
 am_epochs = 10
 use_pretrain = True
-
+model_save_path = 'logs_am/model_deepspeech.h5'
 
 if __name__ == '__main__':
     data_args = data_hparams()
@@ -34,7 +34,8 @@ if __name__ == '__main__':
     data_args.data_type = 'train'
     train_data = get_data(data_args)
     print(train_data)
-    from model_speech.cnn_ctc import Am, am_hparams
+    #from model_speech.cnn_ctc import Am, am_hparams
+    from model_speech.deepspeech_new import Am,am_hparams
     am_args = am_hparams()
     am_args.vocab_size = len(train_data.am_vocab)
     am_args.gpu_nums = 1
@@ -42,9 +43,9 @@ if __name__ == '__main__':
     am_args.is_training = True
     am = Am(am_args)
 
-    if os.path.exists('logs_am/model.h5') and use_pretrain:
+    if os.path.exists(model_save_path) and use_pretrain:
         print('load acoustic model...')
-        am.ctc_model.load_weights('logs_am/model.h5')
+        am.ctc_model.load_weights(model_save_path)
 
     batch_num = len(train_data.wav_lst) // train_data.batch_size
     #
@@ -67,6 +68,8 @@ if __name__ == '__main__':
             epochs=1,
             workers=1,
         )
+
+
         #dev_batch = dev_data.get_am_batch()
         #am.ctc_model.fit_generator(train_batch, steps_per_epoch=batch_num, epochs=1, callbacks=[checkpoint], workers=1, use_multiprocessing=False, validation_data=dev_batch, validation_steps=200)
-        am.ctc_model.save_weights('logs_am/model.h5')
+        am.ctc_model.save_weights(model_save_path)
